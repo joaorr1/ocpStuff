@@ -1,37 +1,28 @@
-apiVersion: build.openshift.io/v1
+apiVersion: v1
 kind: BuildConfig
 metadata:
-  labels:
-    app: ocpStuff
-    resourcetype: build
-  name: ocpStuff-build
+  name: angular-sample-build
 spec:
-  failedBuildsHistoryLimit: 2
-  nodeSelector: null
-  output:
-    to:
-      kind: ImageStreamTag
-      name: ocpStuff-build:latest
-  postCommit: {}
-  resources:
-    limits:
-      cpu: "2"
-      memory: 2Gi
-    requests:
-      cpu: "500m"
-      memory: 500Mi
-  runPolicy: Serial
   source:
-    contextDir: C:\Users\joaor\Downloads\myReps\ocpStuffVS\ocpStuff
     git:
-      ref: master
-      uri: https://github.com/joaorr1/ocpStuff.git
+      uri: 'https://github.com/joaorr1/ocpStuff'
     type: Git
- strategy:
-  type: "Source"
-  sourceStrategy:
-    from:
-      kind: "ImageStreamTag"
-      name: "incremental-image:latest" 
-    incremental: true 
-  successfulBuildsHistoryLimit: 5
+  triggers:
+    - github:
+        secret: secret101
+      type: GitHub
+    - generic:
+        secret: secret101
+      type: Generic
+    - type: ImageChange
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'openjdk-11-rhel7:1.0'
+        namespace: openshift
+      output: null
+      to:
+        kind: ImageStreamTag
+        name: 'angular:latest'
+    type: Source
